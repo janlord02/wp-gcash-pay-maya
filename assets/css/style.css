@@ -1,0 +1,432 @@
+/* Admin Settings Styles */
+.qr-code-input {
+    background-color: #f9f9f9 !important;
+}
+
+.qr-upload-btn {
+    margin-right: 10px !important;
+}
+
+.qr-preview {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.qr-preview img {
+    max-width: 200px;
+    height: auto;
+    border: 1px solid #ddd;
+    padding: 5px;
+    background: white;
+}
+
+/* Checkout Page Styles */
+.gcash-paymaya-payment-fields {
+    margin: 20px 0;
+}
+
+.payment-methods {
+    margin: 15px 0;
+}
+
+.payment-method {
+    margin: 10px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+}
+
+.payment-method.selected {
+    border-color: #0073aa;
+    background: #f0f8ff;
+    box-shadow: 0 2px 4px rgba(0, 115, 170, 0.1);
+}
+
+.payment-method input[type="radio"] {
+    margin-right: 10px;
+}
+
+.payment-method label {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.qr-code-display {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.qr-code-display img {
+    max-width: 200px;
+    height: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: white;
+    border-radius: 4px;
+}
+
+.no-qr-message {
+    color: #666;
+    font-style: italic;
+    margin: 10px 0;
+}
+
+/* Payment Details Fields */
+.payment-details-fields {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+}
+
+.payment-details-fields h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.payment-details-fields .form-row {
+    margin-bottom: 15px;
+}
+
+.payment-details-fields .form-row:last-child {
+    margin-bottom: 0;
+}
+
+.payment-details-fields label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.payment-details-fields label .required {
+    color: #e2401c;
+}
+
+.payment-details-fields input[type="number"],
+.payment-details-fields input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.payment-details-fields input[type="number"]:focus,
+.payment-details-fields input[type="tel"]:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+.payment-details-fields input[type="number"].error,
+.payment-details-fields input[type="tel"].error {
+    border-color: #e2401c;
+    box-shadow: 0 0 0 1px #e2401c;
+}
+
+.payment-details-fields .error-message {
+    display: block;
+    margin-top: 5px;
+    color: #e2401c;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.payment-details-fields small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.payment-instructions {
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.payment-instructions h4 {
+    margin: 0 0 15px 0;
+    color: #0073aa;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+}
+
+.payment-instructions ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step-counter;
+}
+
+.payment-instructions li {
+    position: relative;
+    margin: 15px 0 !important;
+    padding: 15px 20px 15px 50px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 4px solid #0073aa;
+    counter-increment: step-counter;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.payment-instructions li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0073aa;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,115,170,0.3);
+}
+
+.payment-instructions li:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+.payment-instructions li:first-child {
+    margin-top: 0;
+}
+
+.payment-instructions li:last-child {
+    margin-bottom: 0;
+}
+
+/* Thank You Page Styles */
+.gcash-paymaya-thankyou {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.gcash-paymaya-thankyou h2 {
+    color: #0073aa;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.qr-code-section {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.qr-code-section h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.qr-code-section img {
+    max-width: 300px;
+    height: auto;
+    border: 2px solid #0073aa;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.instructions {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f0f8ff;
+    border-left: 4px solid #0073aa;
+    border-radius: 4px;
+}
+
+.order-details {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 4px;
+}
+
+.order-details h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.order-details p {
+    margin: 8px 0;
+}
+
+.order-details strong {
+    color: #0073aa;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .qr-code-display img,
+    .qr-code-section img {
+        max-width: 100%;
+    }
+    
+    .payment-method {
+        padding: 10px;
+    }
+    
+    .gcash-paymaya-thankyou {
+        padding: 10px;
+    }
+}
+
+/* Admin Preview Styles */
+.gcash-qr-preview,
+.paymaya-qr-preview {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.gcash-qr-preview img,
+.paymaya-qr-preview img {
+    max-width: 200px;
+    height: auto;
+    border: 1px solid #ddd;
+    padding: 5px;
+    background: white;
+    border-radius: 4px;
+}
+
+.remove-qr-btn {
+    margin-top: 5px !important;
+}
+
+/* Admin Order Page Styles */
+.gcash-paymaya-order-details {
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+}
+
+.gcash-paymaya-order-details h4 {
+    margin: 0 0 15px 0;
+    color: #0073aa;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 5px;
+}
+
+.gcash-paymaya-order-details h5 {
+    margin: 10px 0 5px 0;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.gcash-paymaya-order-details p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.gcash-paymaya-order-details strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.gcash-paymaya-order-details .qr-code-section {
+    text-align: center;
+    margin: 10px 0;
+    padding: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Meta Box Styles */
+.gcash-paymaya-meta-box {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.gcash-paymaya-meta-box p {
+    margin: 8px 0;
+}
+
+.gcash-paymaya-meta-box strong {
+    color: #23282d;
+    font-weight: 600;
+}
+
+.gcash-paymaya-meta-box span {
+    display: inline-block;
+    margin-top: 2px;
+}
+
+/* Order Status Indicators */
+.gcash-paymaya-meta-box .verification-required {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 8px;
+    border-radius: 3px;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.gcash-paymaya-meta-box .payment-verified {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 8px;
+    border-radius: 3px;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+/* Amount Comparison Styles */
+.gcash-paymaya-meta-box .amount-match {
+    color: #46b450;
+    font-weight: bold;
+}
+
+.gcash-paymaya-meta-box .amount-mismatch {
+    color: #dc3232;
+    font-weight: bold;
+}
+
+.gcash-paymaya-meta-box .amount-difference {
+    color: #dc3232;
+    font-size: 11px;
+    font-style: italic;
+} 
