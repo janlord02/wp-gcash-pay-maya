@@ -9,6 +9,7 @@ A professional WooCommerce payment gateway plugin that allows merchants to accep
 - **Payment Details Collection**: Collect amount sent and phone number used for payment verification
 - **Manual Payment Confirmation**: Orders are placed on hold until payment is manually verified
 - **WooCommerce Integration**: Full integration with WooCommerce checkout, orders, and emails
+- **Shortcode Compatible**: Works with WooCommerce checkout shortcode `[woocommerce_checkout]`
 - **HPOS Compatible**: Compatible with WooCommerce High-Performance Order Storage
 - **Classic Checkout Compatible**: Works with WooCommerce classic checkout
 - **Responsive Design**: Mobile-friendly interface for both admin and frontend
@@ -44,6 +45,39 @@ A professional WooCommerce payment gateway plugin that allows merchants to accep
 3. Choose the plugin zip file
 4. Click "Install Now" and then "Activate"
 5. Configure the gateway settings
+
+## 🎯 Shortcode Usage
+
+### Checkout Shortcode
+The plugin works seamlessly with WooCommerce's checkout shortcode. You can use the standard WooCommerce checkout shortcode on any page:
+
+```
+[woocommerce_checkout]
+```
+
+### Custom Checkout Page
+To create a custom checkout page with the GCash & PayMaya payment gateway:
+
+1. **Create a new page** in WordPress
+2. **Add the shortcode**: `[woocommerce_checkout]`
+3. **Set as checkout page** in WooCommerce settings (WooCommerce > Settings > Advanced > Page setup)
+4. **Configure the gateway** (WooCommerce > Settings > Payments > GCash & PayMaya Payment Gateway)
+
+### Example Usage
+```php
+// In your theme or custom plugin
+echo do_shortcode('[woocommerce_checkout]');
+
+// Or in a page/post
+[woocommerce_checkout]
+```
+
+### Shortcode with Parameters
+You can also use the shortcode with additional parameters for customization:
+
+```
+[woocommerce_checkout order_button_text="Pay with GCash/PayMaya"]
+```
 
 ## ⚙️ Configuration
 
@@ -151,6 +185,12 @@ Contributions are welcome! Please feel free to submit pull requests or report is
 2. **Verify Payment Methods**: Check that at least one payment method (GCash or PayMaya) is enabled
 3. **WooCommerce Configuration**: Verify WooCommerce is properly configured
 4. **Plugin Conflicts**: Check for conflicts with other payment plugins
+
+### Shortcode Issues
+1. **Shortcode Not Working**: Ensure WooCommerce is active and properly configured
+2. **Payment Gateway Not Showing**: Check that the gateway is enabled in WooCommerce settings
+3. **Page Setup**: Verify the checkout page is set in WooCommerce > Settings > Advanced > Page setup
+4. **Theme Compatibility**: Some themes may require additional setup for shortcode functionality
 
 ### QR Codes Not Uploading
 1. **Media Library**: Ensure WordPress media library is working
