@@ -1,19 +1,21 @@
 <?php
 /**
  * Plugin Name: GCash & PayMaya Payment Gateway
+ * Plugin URI: https://janlordluga.com/
  * Description: Accept payments via QR codes for GCash and PayMaya with manual payment confirmation
  * Version: 1.2.0
- * Author: Janlord Luga
- * Author URI: https://janlordluga.com/
- * Text Domain: gcash-paymaya-payment-gateway
- * Domain Path: /languages
  * Requires at least: 5.0
  * Tested up to: 6.4
  * WC requires at least: 5.0
  * WC tested up to: 8.5
  * Requires PHP: 7.4
+ * Author: Janlord Luga
+ * Author URI: https://janlordluga.com/
+ * Text Domain: gcash-paymaya-payment-gateway
+ * Domain Path: /languages
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Network: false
  */
 
 // Exit if accessed directly
@@ -25,6 +27,20 @@ if (!defined('ABSPATH')) {
 define('GCASH_PAYMAYA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('GCASH_PAYMAYA_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('GCASH_PAYMAYA_PLUGIN_VERSION', '1.2.0');
+
+// Declare HPOS compatibility - this MUST be the first thing after constants
+add_action('before_woocommerce_init', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_orders_table', __FILE__, true);
+    }
+}, 0);
+
+// Also declare compatibility on plugins_loaded for extra safety
+add_action('plugins_loaded', function () {
+    if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_orders_table', __FILE__, true);
+    }
+}, 0);
 
 // Check if WooCommerce is active
 function gcash_paymaya_check_wc()
@@ -40,10 +56,39 @@ function gcash_paymaya_check_wc()
     return true;
 }
 
+// Check PHP version compatibility
+function gcash_paymaya_check_php_version()
+{
+    if (version_compare(PHP_VERSION, '7.4', '<')) {
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-error"><p>' .
+                __('GCash & PayMaya Payment Gateway requires PHP 7.4 or higher. Current version: ' . PHP_VERSION, 'gcash-paymaya-payment-gateway') .
+                '</p></div>';
+        });
+        return false;
+    }
+    return true;
+}
+
+// Check WordPress version compatibility
+function gcash_paymaya_check_wp_version()
+{
+    if (version_compare(get_bloginfo('version'), '5.0', '<')) {
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-error"><p>' .
+                __('GCash & PayMaya Payment Gateway requires WordPress 5.0 or higher.', 'gcash-paymaya-payment-gateway') .
+                '</p></div>';
+        });
+        return false;
+    }
+    return true;
+}
+
 // Initialize the plugin
 function gcash_paymaya_init()
 {
-    if (!gcash_paymaya_check_wc()) {
+    // Check all requirements
+    if (!gcash_paymaya_check_php_version() || !gcash_paymaya_check_wp_version() || !gcash_paymaya_check_wc()) {
         return;
     }
 
@@ -52,11 +97,21 @@ function gcash_paymaya_init()
     if (file_exists($gateway_file)) {
         require_once $gateway_file;
     } else {
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-error"><p>' .
+                __('GCash & PayMaya Payment Gateway: Gateway class file not found.', 'gcash-paymaya-payment-gateway') .
+                '</p></div>';
+        });
         return;
     }
 
     // Check if class exists
     if (!class_exists('WC_Gateway_GCash_PayMaya')) {
+        add_action('admin_notices', function () {
+            echo '<div class="notice notice-error"><p>' .
+                __('GCash & PayMaya Payment Gateway: Gateway class not found.', 'gcash-paymaya-payment-gateway') .
+                '</p></div>';
+        });
         return;
     }
 
@@ -75,37 +130,38 @@ function gcash_paymaya_add_gateway($gateways)
 // Register gateway for block-based checkout
 function gcash_paymaya_register_block_support()
 {
-    if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
-        require_once GCASH_PAYMAYA_PLUGIN_PATH . 'includes/class-gcash-paymaya-blocks-support.php';
+    try {
+        if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
+            $blocks_file = GCASH_PAYMAYA_PLUGIN_PATH . 'includes/class-gcash-paymaya-blocks-support.php';
+            if (file_exists($blocks_file)) {
+                require_once $blocks_file;
 
-        add_action(
-            'woocommerce_blocks_payment_method_type_registration',
-            function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
-                if (class_exists('GCash_PayMaya_Blocks_Support')) {
-                    $payment_method_registry->register(new GCash_PayMaya_Blocks_Support());
-                }
+                add_action(
+                    'woocommerce_blocks_payment_method_type_registration',
+                    function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+                        if (class_exists('GCash_PayMaya_Blocks_Support')) {
+                            $payment_method_registry->register(new GCash_PayMaya_Blocks_Support());
+                        }
+                    }
+                );
             }
-        );
+        }
+    } catch (Exception $e) {
+        // Silently fail for blocks support
     }
 }
 add_action('init', 'gcash_paymaya_register_block_support', 5);
 
-// Declare block support
-function gcash_paymaya_declare_block_support()
-{
-    if (class_exists('Automattic\WooCommerce\Utilities\FeaturesUtil')) {
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
-        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_orders_table', __FILE__, true);
-    }
-}
-add_action('before_woocommerce_init', 'gcash_paymaya_declare_block_support');
-
 // Force WooCommerce to recognize block support
 function gcash_paymaya_force_block_support($supports, $gateway_id)
 {
-    if ($gateway_id === 'gcash_paymaya') {
-        $supports['woocommerce_blocks'] = true;
-        $supports['cart_checkout_blocks'] = true;
+    try {
+        if ($gateway_id === 'gcash_paymaya') {
+            $supports['woocommerce_blocks'] = true;
+            $supports['cart_checkout_blocks'] = true;
+        }
+    } catch (Exception $e) {
+        // Silently fail
     }
     return $supports;
 }
@@ -114,8 +170,12 @@ add_filter('woocommerce_payment_gateway_supports', 'gcash_paymaya_force_block_su
 // Add block compatibility filter
 function gcash_paymaya_block_compatibility($compatible, $gateway_id)
 {
-    if ($gateway_id === 'gcash_paymaya') {
-        return true;
+    try {
+        if ($gateway_id === 'gcash_paymaya') {
+            return true;
+        }
+    } catch (Exception $e) {
+        // Silently fail
     }
     return $compatible;
 }
@@ -124,13 +184,17 @@ add_filter('woocommerce_payment_gateway_block_compatibility', 'gcash_paymaya_blo
 // Register as block-compatible payment method
 function gcash_paymaya_register_block_payment_method()
 {
-    if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
-        add_filter('woocommerce_blocks_payment_method_type_registration', function ($registry) {
-            if (class_exists('GCash_PayMaya_Blocks_Support')) {
-                $registry->register(new GCash_PayMaya_Blocks_Support());
-            }
-            return $registry;
-        });
+    try {
+        if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
+            add_filter('woocommerce_blocks_payment_method_type_registration', function ($registry) {
+                if (class_exists('GCash_PayMaya_Blocks_Support')) {
+                    $registry->register(new GCash_PayMaya_Blocks_Support());
+                }
+                return $registry;
+            });
+        }
+    } catch (Exception $e) {
+        // Silently fail
     }
 }
 add_action('init', 'gcash_paymaya_register_block_payment_method', 1);
@@ -138,15 +202,24 @@ add_action('init', 'gcash_paymaya_register_block_payment_method', 1);
 // Clear cache on plugin activation
 function gcash_paymaya_activate()
 {
-    // Clear any cached compatibility data
-    delete_transient('wc_block_compatibility_gcash-paymaya-payment-gateway/gcash-paymaya-payment-gateway.php');
-    delete_transient('wc_payment_gateway_compatibility_gcash-paymaya-payment-gateway/gcash-paymaya-payment-gateway.php');
+    try {
+        // Clear any cached compatibility data
+        delete_transient('wc_block_compatibility_gcash-paymaya-payment-gateway/gcash-paymaya-payment-gateway.php');
+        delete_transient('wc_payment_gateway_compatibility_gcash-paymaya-payment-gateway/gcash-paymaya-payment-gateway.php');
 
-    // Clear WordPress cache
-    wp_cache_flush();
+        // Clear WordPress cache
+        if (function_exists('wp_cache_flush')) {
+            wp_cache_flush();
+        }
 
-    // Force WooCommerce to re-register payment gateways
-    do_action('woocommerce_payment_gateways');
+        // Force WooCommerce to re-register payment gateways
+        if (function_exists('do_action')) {
+            do_action('woocommerce_payment_gateways');
+        }
+    } catch (Exception $e) {
+        // Log error but don't prevent activation
+        error_log('GCash PayMaya Gateway activation error: ' . $e->getMessage());
+    }
 }
 register_activation_hook(__FILE__, 'gcash_paymaya_activate');
 
