@@ -54,43 +54,40 @@ class WC_Gateway_GCash_PayMaya extends WC_Payment_Gateway
      */
     public function __construct()
     {
-        $this->id = 'gcash_paymaya';
-        $this->icon = '';
-        $this->has_fields = true;
-        $this->method_title = __('GCash & PayMaya Payment Gateway', 'gcash-paymaya-payment-gateway');
-        $this->method_description = __('Accept payments via QR codes for GCash and PayMaya with manual payment confirmation.', 'gcash-paymaya-payment-gateway');
-        $this->supports = array('products', 'refunds', 'woocommerce_blocks');
+        try {
+            $this->id = 'gcash_paymaya';
+            $this->icon = '';
+            $this->has_fields = true;
+            $this->method_title = __('GCash & PayMaya Payment Gateway', 'gcash-paymaya-payment-gateway');
+            $this->method_description = __('Accept payments via QR codes for GCash and PayMaya with manual payment confirmation.', 'gcash-paymaya-payment-gateway');
+            $this->supports = array('products', 'refunds', 'woocommerce_blocks');
 
-        // Load the settings
-        $this->init_form_fields();
-        $this->init_settings();
+            // Load the settings
+            $this->init_form_fields();
+            $this->init_settings();
 
-        // Define properties
-        $this->title = $this->get_option('title');
-        $this->description = $this->get_option('description');
-        $this->enabled = $this->get_option('enabled');
-        $this->gcash_enabled = $this->get_option('gcash_enabled');
-        $this->paymaya_enabled = $this->get_option('paymaya_enabled');
-        $this->gcash_qr_code = $this->get_option('gcash_qr_code');
-        $this->paymaya_qr_code = $this->get_option('paymaya_qr_code');
-        $this->instructions = $this->get_option('instructions');
+            // Define properties
+            $this->title = $this->get_option('title');
+            $this->description = $this->get_option('description');
+            $this->enabled = $this->get_option('enabled');
+            $this->gcash_enabled = $this->get_option('gcash_enabled');
+            $this->paymaya_enabled = $this->get_option('paymaya_enabled');
+            $this->gcash_qr_code = $this->get_option('gcash_qr_code');
+            $this->paymaya_qr_code = $this->get_option('paymaya_qr_code');
+            $this->instructions = $this->get_option('instructions');
 
-        // Actions
-        add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
-        add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
-        add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
+            // Actions
+            add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
+            add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
+            add_action('woocommerce_email_before_order_table', array($this, 'email_instructions'), 10, 3);
 
-        // Add payment details to order admin page
-        add_action('add_meta_boxes', array($this, 'add_payment_details_meta_box'));
-        add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'display_payment_details_in_order'));
-
-        // HPOS compatibility
-        add_action('before_woocommerce_init', function () {
-            if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
-                \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_orders_table', __FILE__, true);
-                \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('cart_checkout_blocks', __FILE__, true);
-            }
-        });
+            // Add payment details to order admin page
+            add_action('add_meta_boxes', array($this, 'add_payment_details_meta_box'));
+            add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'display_payment_details_in_order'));
+        } catch (Exception $e) {
+            // Log error but don't prevent gateway from loading
+            error_log('GCash PayMaya Gateway constructor error: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -333,6 +330,14 @@ class WC_Gateway_GCash_PayMaya extends WC_Payment_Gateway
     public function process_payment($order_id)
     {
         $order = wc_get_order($order_id);
+
+        if (!$order) {
+            return array(
+                'result' => 'failure',
+                'messages' => __('Order not found', 'gcash-paymaya-payment-gateway')
+            );
+        }
+
         $payment_method = isset($_POST['gcash_paymaya_method']) ? sanitize_text_field($_POST['gcash_paymaya_method']) : 'gcash';
         $amount_sent = isset($_POST['gcash_paymaya_amount']) ? sanitize_text_field($_POST['gcash_paymaya_amount']) : '';
         $phone_number = isset($_POST['gcash_paymaya_phone']) ? sanitize_text_field($_POST['gcash_paymaya_phone']) : '';
@@ -340,7 +345,7 @@ class WC_Gateway_GCash_PayMaya extends WC_Payment_Gateway
         // Mark as on-hold (we're awaiting the payment)
         $order->update_status('on-hold', __('Awaiting payment confirmation via ' . ucfirst($payment_method), 'gcash-paymaya-payment-gateway'));
 
-        // Store payment method used
+        // Store payment method used - use HPOS-compatible methods
         $order->update_meta_data('_gcash_paymaya_method', $payment_method);
         $order->update_meta_data('_gcash_paymaya_amount', $amount_sent);
         $order->update_meta_data('_gcash_paymaya_phone', $phone_number);
